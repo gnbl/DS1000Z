@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 
 """
 Python script to save Rigol DS1000Z(-S) family oscilloscope screen to file ("screenshot", "hardcopy").
@@ -12,17 +12,19 @@ required pyvisa https://pyvisa.readthedocs.org/
 optional PILlow https://pillow.readthedocs.org/
 """
 
-
+# standard library
 import sys
-import io
+import datetime
 
+# pyvisa
 try:
   import visa
 except ImportError:
   print("pyVISA not installed")
   sys.exit()
 
-  
+
+
 def main():
   """
   pyVISA access needs to be encapsulated in function!? -> https://github.com/hgrecco/pyvisa/issues/33
@@ -48,24 +50,31 @@ def main():
   ins.close()
   
   # save image file
-  filename = "screen"
+  name = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+  print("Enter a filename-safe description (or none). Hit return.")
+  comment = input( name + '_' )
+  if( len(comment) ):
+    name = name + "_" + comment
   try:
     from PIL import Image
-    print("Saving PNG")
+    import io
     ext = ".png"
+    filename = name + ext
+    print("Saving screen as ", filename)
     im = Image.open( io.BytesIO(bmp) )
-    im.save( filename + ext )
+    im.save( filename )
     
   except ImportError as e:
     print("PIL(low) not imported because:", e)
-    print("Saving BMP")
     ext = ".bmp"
+    filename = name + ext
+    print("Saving screen as ", filename)
     with open( filename + ext , "wb") as f:
       f.write( bmp )
 
 
 if __name__ == "__main__":
-
+  
   print( "Python", sys.version, "on", sys.platform )
   print( "Pyvisa", visa.__version__ )
   
