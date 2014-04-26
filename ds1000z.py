@@ -25,9 +25,9 @@ except ImportError:
 
 
 
-def main():
+def screenshot():
   """
-  pyVISA access needs to be encapsulated in function!? -> https://github.com/hgrecco/pyvisa/issues/33
+  
   """
   rm = visa.ResourceManager()
   
@@ -45,7 +45,7 @@ def main():
   '''
   
   ins.write(":DISP:DATA?")
-  bmp = ins.read_raw()[2+9:]
+  bmpdata = ins.read_raw()[2+9:]
   
   ins.close()
   
@@ -55,30 +55,49 @@ def main():
   comment = input( name + '_' )
   if( len(comment) ):
     name = name + "_" + comment
+    
   try:
     from PIL import Image
-    import io
-    ext = ".png"
-    filename = name + ext
-    print("Saving screen as ", filename)
-    im = Image.open( io.BytesIO(bmp) )
-    im.save( filename )
-    
+  
   except ImportError as e:
     print("PIL(low) not imported because:", e)
-    ext = ".bmp"
-    filename = name + ext
-    print("Saving screen as ", filename)
-    with open( filename + ext , "wb") as f:
-      f.write( bmp )
-
+    filename = name + ".bmp"
+    print("Saving screen as", filename)
+    with open( filename, "wb") as f:
+      f.write( bmpdata )
+  
+  else:
+    print( "PILlow", sys.version)
+    import io
+    filename = name + ".png"
+    print("Saving screen as", filename)
+    im = Image.open( io.BytesIO(bmpdata) )
+    
+    #logo = ((5,10),(74,16))
+    #measure = ((0,37),(60,414))
+    try:
+      overlay = Image.open( "overlay050.png" )
+    except IOError as e:
+      print("Overlay image file could not be opened because:", e)
+    else:
+      im.putalpha(255)
+      im = Image.alpha_composite(im, overlay)
+    
+    print("writing file")
+    im.save( filename )
+  
+  try:
+    import os
+    os.startfile(filename)
+  except AttributeError as e:
+    print("Could not open image file in default application because:", e)
 
 if __name__ == "__main__":
   
   print( "Python", sys.version, "on", sys.platform )
   print( "Pyvisa", visa.__version__ )
   
-  main()
+  screenshot()
   
   print( "done." )
 
