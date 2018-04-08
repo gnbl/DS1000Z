@@ -1,3 +1,5 @@
+Note: There's very likely better software out there, none tried but e.g. https://github.com/pklaus/ds1054z (connects via Ethernet, also has improved on the use of my mask images to darken unimportant areas of the screen, i.e. the logo etc.). The VISA stuff has always caused me some pain (very large software packages, connection issues) ...
+
 DS1000Z
 =======
 
